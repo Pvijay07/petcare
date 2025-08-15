@@ -61,7 +61,7 @@ export const ServiceCard = ({
 
         <p className="text-muted-foreground mb-4 line-clamp-2">{description}</p>
 
-        <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
+        {/* <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Clock className="h-4 w-4" />
             <span>{duration}</span>
@@ -70,7 +70,7 @@ export const ServiceCard = ({
             <MapPin className="h-4 w-4" />
             <span>{location}</span>
           </div>
-        </div>
+        </div> */}
 
         <div className="flex items-center justify-between">
           <div>
