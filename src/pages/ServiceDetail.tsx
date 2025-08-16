@@ -1,411 +1,293 @@
-import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import React, { useState } from 'react';
+import { ArrowLeft, Plus, Check, Clock, Star, Bone } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Accordion, AccordionItem, AccordionTrigger, AccordionContent
-} from "@/components/ui/accordion";
-import {
-  RadioGroup, RadioGroupItem
-} from "@/components/ui/radio-group";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+const PetBookingService = () => {
+  const [selectedPackageType, setSelectedPackageType] = useState('perday');
+  const [selectedServiceDays, setSelectedServiceDays] = useState('mon-sat');
+  const [selectedWalksPerDay, setSelectedWalksPerDay] = useState('2');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [customTime, setCustomTime] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [packageSelected, setPackageSelected] = useState(false);
 
-import {
-  Check, PawPrint, Bone, Dog, Zap, Calendar, Clock, Heart,
-  User, Plus, ChevronUp
-} from "lucide-react";
-
-interface WalkingServiceCardsProps {
-  serviceId: string;
-}
-
-/* ---------- Constants ---------- */
-const commonFeatures = [
-  "GPS tracking & updates",
-  "Professional pet care",
-  "Photo updates after walk",
-  "Flexible scheduling",
-];
-
-const durations = [
-  { id: "30min", name: "Quick Stroll (30min)", basePrice: 25, icon: <PawPrint className="h-7 w-7 text-blue-500" />, isPopular: false },
-  { id: "45min", name: "Standard Walk (45min)", basePrice: 35, icon: <Bone className="h-7 w-7 text-orange-500" />, isPopular: true },
-  { id: "60min", name: "Extended Walk (60min)", basePrice: 50, icon: <Dog className="h-7 w-7 text-purple-500" />, isPopular: false },
-];
-
-const scheduleOptions = {
-  weekdays: { days: 5, label: "Weekdays", multiplier: 1, icon: <Calendar className="h-4 w-4" /> },
-  weekends: { days: 2, label: "Weekends", multiplier: 1.2, icon: <Heart className="h-4 w-4" /> },
-  everyday: { days: 7, label: "Daily", multiplier: 0.9, icon: <Zap className="h-4 w-4" /> },
-} as const;
-
-type ScheduleKey = keyof typeof scheduleOptions;
-
-const savedPets = [
-  { id: "1", name: "Max", breed: "Golden Retriever", age: "3 years", weight: "65 lbs", specialNeeds: "Allergic to chicken", image: "" },
-  { id: "2", name: "Bella", breed: "Siamese Cat", age: "5 years", weight: "8 lbs", specialNeeds: "None", image: "" },
-];
-
-/* ---------- Component ---------- */
-const WalkingServiceCards: React.FC<WalkingServiceCardsProps> = ({ serviceId }) => {
-  const navigate = useNavigate();
-
-  // Global selectors (applies to all packages)
-  const [schedule, setSchedule] = useState<ScheduleKey>("weekdays");
-  const [walksPerDay, setWalksPerDay] = useState<number>(1);
-
-  // Pet info
-  const [showNewPetForm, setShowNewPetForm] = useState(false);
-  const [selectedPet, setSelectedPet] = useState<string>("");
-  const [formData, setFormData] = useState({
-    selectedPet: "",
-    petName: "",
-    petBreed: "",
-    petAge: "",
-    petWeight: "",
-    specialNeeds: "",
-  });
-
-  const handlePetSelection = (petId: string) => {
-    const selected = savedPets.find((p) => p.id === petId);
-    if (selected) {
-      setSelectedPet(petId);
-      setFormData((prev) => ({
-        ...prev,
-        selectedPet: petId,
-        petName: selected.name,
-        petBreed: selected.breed,
-        petAge: selected.age,
-        petWeight: selected.weight,
-        specialNeeds: selected.specialNeeds,
-      }));
+  const packageTypes = [
+    {
+      id: 'monthly',
+      name: 'Monthly Package',
+      icon: Star,
+      gradient: 'from-purple-500 to-pink-500'
+    },
+    {
+      id: 'perday',
+      name: 'Per Day Package',
+      icon: Bone,
+      gradient: 'from-orange-500 to-red-500'
     }
-  };
+  ];
 
-  // Price calculator (keeps your original logic)
-  const calculateWalkingPrice = (basePrice: number) => {
-    const sched = scheduleOptions[schedule];
-    const totalWalks = sched.days * walksPerDay;
-    const adjustedPrice = basePrice * totalWalks * sched.multiplier;
-    return {
-      weeklyPrice: Math.round(adjustedPrice),
-      pricePerWalk: Math.round((adjustedPrice / totalWalks) * 100) / 100,
-      totalWalks,
-    };
-  };
+  const serviceDays = [
+    { id: 'mon-sat', label: 'Mon-Sat' },
+    { id: 'mon-sun', label: 'Mon-Sun' }
+  ];
 
-  const getDiscountInfo = useMemo(() => {
-    if (schedule === "everyday") return { text: "10% OFF", color: "bg-green-500" };
-    if (schedule === "weekends") return { text: "Weekend +20%", color: "bg-amber-500" };
-    return null;
-  }, [schedule]);
+  const walkOptions = [
+    { id: '1', label: '1 Walk' },
+    { id: '2', label: '2 Walk' },
+    { id: '3', label: '3 Walk' }
+  ];
+
+  const timeSlots = [
+    { id: 'morning', label: 'Morning', suffix: 'AM' },
+    { id: 'afternoon', label: 'Afternoon', suffix: 'PM' },
+    { id: 'evening', label: 'Evening', suffix: 'PM' }
+  ];
+
+  const features = [
+    'Booking Guarantee',
+    'Professional Dog Walker Only',
+    'Secure Payment',
+    'Assured Service',
+    'Each Walk Duration: 30min'
+  ];
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
-      {/* ---------- Pet Information ---------- */}
-      <Card className="border-border">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Pet Information
-          </CardTitle>
-          <CardDescription>
-            Select a previously saved pet or add a new one
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Saved Pets (visual selector) */}
-          <div>
-            <div className="mb-3 text-sm font-medium">Saved Pets</div>
-            <div className="flex gap-4 overflow-x-auto pb-1">
-              {savedPets.map((pet) => (
-                <motion.button
-                  key={pet.id}
-                  type="button"
-                  whileTap={{ scale: 0.97 }}
-                  className={`min-w-[180px] flex items-center gap-3 p-3 rounded-xl border transition-all ${
-                    selectedPet === pet.id
-                      ? "border-primary bg-primary/5 shadow-sm"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                  onClick={() => handlePetSelection(pet.id)}
-                >
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-                    {pet.image ? (
-                      <img src={pet.image} alt={pet.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <Dog className="text-muted-foreground" />
-                    )}
-                  </div>
-                  <div className="text-left">
-                    <div className="font-semibold">{pet.name}</div>
-                    <div className="text-xs text-muted-foreground">{pet.breed}</div>
-                  </div>
-                  {selectedPet === pet.id && (
-                    <Badge variant="secondary" className="ml-auto">Selected</Badge>
-                  )}
-                </motion.button>
-              ))}
-            </div>
-          </div>
-
-          {/* Saved Pets (Accordion + RadioGroup for accessibility & details) */}
-          <Accordion type="single" collapsible>
-            <AccordionItem value="saved-pets">
-              <AccordionTrigger className="hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <span>Select from saved pets (detailed)</span>
-                  {formData.selectedPet && <Badge variant="secondary">Selected</Badge>}
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <RadioGroup
-                  value={formData.selectedPet}
-                  onValueChange={handlePetSelection}
-                  className="space-y-3"
-                >
-                  {savedPets.map((pet) => (
-                    <div
-                      key={pet.id}
-                      className={`flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent/50 ${
-                        selectedPet === pet.id ? "border-primary bg-primary/5" : "border-border"
-                      }`}
-                    >
-                      <RadioGroupItem value={pet.id} id={`pet-${pet.id}`} />
-                      <div className="flex-1">
-                        <label htmlFor={`pet-${pet.id}`} className="font-medium cursor-pointer">
-                          {pet.name} ({pet.breed})
-                        </label>
-                        <div className="text-sm text-muted-foreground mt-1">
-                          <p>Age: {pet.age} • Weight: {pet.weight}</p>
-                          {pet.specialNeeds && <p>Special Needs: {pet.specialNeeds}</p>}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-
-          {/* Toggle New Pet Form */}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setShowNewPetForm((s) => !s)}
-            className="w-full"
-          >
-            {showNewPetForm ? (
-              <>
-                <ChevronUp className="h-4 w-4 mr-2" />
-                Hide new pet form
-              </>
-            ) : (
-              <>
-                <Plus className="h-4 w-4 mr-2" />
-                Add new pet
-              </>
-            )}
-          </Button>
-
-          {/* New Pet Form */}
-          {showNewPetForm && (
-            <div className="space-y-4 pt-4 border-t">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="petName">Pet Name *</Label>
-                  <Input
-                    id="petName"
-                    value={formData.petName}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, petName: e.target.value }))}
-                    placeholder="Enter your pet's name"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="petBreed">Breed</Label>
-                  <Input
-                    id="petBreed"
-                    value={formData.petBreed}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, petBreed: e.target.value }))}
-                    placeholder="e.g., Golden Retriever"
-                  />
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="petAge">Age</Label>
-                  <Input
-                    id="petAge"
-                    value={formData.petAge}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, petAge: e.target.value }))}
-                    placeholder="e.g., 3 years"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="petWeight">Weight</Label>
-                  <Input
-                    id="petWeight"
-                    value={formData.petWeight}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, petWeight: e.target.value }))}
-                    placeholder="e.g., 25 lbs"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="specialNeeds">Special Needs or Medical Conditions</Label>
-                <Textarea
-                  id="specialNeeds"
-                  value={formData.specialNeeds}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, specialNeeds: e.target.value }))}
-                  placeholder="Any allergies, medical conditions, or special requirements..."
-                  className="h-20"
-                />
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* ---------- Sticky Global Selector ---------- */}
-      <div className="sticky top-2 z-40 bg-background shadow-lg rounded-lg p-4 border border-border">
-        <div className="grid md:grid-cols-2 gap-4">
-          {/* Schedule */}
-          <div>
-            <label className="flex items-center gap-2 text-sm font-semibold mb-2">
-              <Calendar className="h-4 w-4 text-primary" /> Schedule
-            </label>
-            <div className="flex gap-2">
-              {Object.entries(scheduleOptions).map(([key, s]) => (
-                <Button
-                  key={key}
-                  variant={schedule === key ? "default" : "outline"}
-                  onClick={() => setSchedule(key as ScheduleKey)}
-                  className="flex-1 rounded-full"
-                >
-                  {s.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Walks per Day */}
-          <div>
-            <label className="flex items-center gap-2 text-sm font-semibold mb-2">
-              <Clock className="h-4 w-4 text-primary" /> Walks per day
-            </label>
-            <div className="flex gap-2">
-              {[1, 2].map((walks) => (
-                <Button
-                  key={walks}
-                  variant={walksPerDay === walks ? "default" : "outline"}
-                  onClick={() => setWalksPerDay(walks)}
-                  className="flex-1 rounded-full"
-                >
-                  {walks} Walk{walks > 1 ? "s" : ""}
-                </Button>
-              ))}
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4">
+          <div className="flex items-center space-x-4">
+            <button className="text-white hover:bg-white/20 rounded-full p-2 transition-colors">
+              <ArrowLeft size={20} />
+            </button>
+            <h1 className="text-white text-lg font-semibold">Booking Summary</h1>
           </div>
         </div>
-      </div>
 
-      {/* ---------- Packages ---------- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {durations.map((duration, index) => {
-          const pricing = calculateWalkingPrice(duration.basePrice);
-          const discount = getDiscountInfo;
+        <div className="p-6 space-y-6">
+          {/* My Pet Section */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-gray-800">My Pet</h2>
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                    🐕
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                    <Check size={12} className="text-white" />
+                  </div>
+                </div>
+                <p className="text-center text-sm font-medium mt-2">Zoro</p>
+              </div>
+              <button className="w-12 h-12 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center hover:border-indigo-400 transition-colors">
+                <Plus size={20} className="text-gray-400" />
+              </button>
+            </div>
+          </div>
 
-          return (
-            <motion.div
-              key={duration.id}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-            >
-              <Card
-                className={`relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02] 
-                ${duration.isPopular ? "border-primary ring-1 ring-primary shadow-lg" : "border-border hover:shadow-md"}`}
-              >
-                {/* Popular & Discount */}
-                {duration.isPopular && (
-                  <div className="absolute -top-2 -right-8 w-32 bg-gradient-to-r from-primary to-primary/80 text-white text-xs font-bold py-1 text-center rotate-45 shadow-md">
-                    Popular
+          {/* Service Type */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-gray-800">Service Type</h2>
+            <div className="grid grid-cols-1 gap-3">
+              {packageTypes.map((pkg) => {
+                const Icon = pkg.icon;
+                return (
+                  <button
+                    key={pkg.id}
+                    onClick={() => setSelectedPackageType(pkg.id)}
+                    className={`relative p-4 rounded-xl border-2 transition-all ${
+                      selectedPackageType === pkg.id
+                        ? 'border-indigo-500 bg-indigo-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center space-x-3">
+                      <Icon 
+                        size={20} 
+                        className={selectedPackageType === pkg.id ? 'text-indigo-600' : 'text-gray-500'} 
+                      />
+                      <span className={`font-medium ${
+                        selectedPackageType === pkg.id ? 'text-indigo-700' : 'text-gray-700'
+                      }`}>
+                        {pkg.name}
+                      </span>
+                      <Icon 
+                        size={20} 
+                        className={selectedPackageType === pkg.id ? 'text-indigo-600' : 'text-gray-500'} 
+                      />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Package Selection */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-gray-800">Select Package</h2>
+            
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6">
+              {/* Dog Walking Header */}
+              <div className="text-center mb-6">
+                <div className="w-20 h-20 mx-auto mb-3 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">🐕‍🦺</span>
+                </div>
+                {selectedPackageType === 'monthly' && (
+                  <div className="mb-2">
+                    <span className="text-2xl font-bold text-indigo-600">₹96/-</span>
+                    <p className="text-sm text-gray-600">Per Walk</p>
                   </div>
                 )}
-                {discount && (
-                  <Badge className={`absolute top-3 left-3 ${discount.color} text-white shadow-sm`}>
-                    {discount.text}
-                  </Badge>
-                )}
+                <h3 className="text-lg font-semibold text-gray-800">Dog Walking</h3>
+              </div>
 
-                <CardHeader className="pb-3 text-center">
-                  <motion.div
-                    initial={{ scale: 0.85, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="mx-auto p-3 rounded-full bg-primary/10"
-                  >
-                    {duration.icon}
-                  </motion.div>
-                  <CardTitle className="mt-3 text-lg font-semibold">{duration.name}</CardTitle>
-                  <CardDescription className="text-sm text-muted-foreground">
-                    {pricing.totalWalks} walks/week • ₹{pricing.pricePerWalk.toFixed(2)} per walk
-                  </CardDescription>
-                </CardHeader>
+              {/* Service Days (Monthly only) */}
+              {selectedPackageType === 'monthly' && (
+                <div className="mb-6">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">Required Service Days</h4>
+                  <div className="flex space-x-2">
+                    {serviceDays.map((day) => (
+                      <button
+                        key={day.id}
+                        onClick={() => setSelectedServiceDays(day.id)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          selectedServiceDays === day.id
+                            ? 'bg-indigo-500 text-white'
+                            : 'bg-white text-gray-600 hover:bg-gray-50'
+                        }`}
+                      >
+                        {day.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-                <CardContent className="text-center">
-                  <motion.div
-                    key={`${pricing.weeklyPrice}-${schedule}-${walksPerDay}`}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-3xl font-bold text-primary"
-                  >
-                    ₹{pricing.weeklyPrice}
-                    <span className="text-sm text-muted-foreground"> /week</span>
-                  </motion.div>
+              {/* Walks Per Day */}
+              <div className="mb-6">
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Required Walk Per Day</h4>
+                <div className="flex space-x-2">
+                  {walkOptions.map((walk) => (
+                    <button
+                      key={walk.id}
+                      onClick={() => setSelectedWalksPerDay(walk.id)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        selectedWalksPerDay === walk.id
+                          ? 'bg-indigo-500 text-white'
+                          : 'bg-white text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      {walk.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-                  <Button
-                    className="w-full mt-4"
-                    size="lg"
-                    variant={duration.isPopular ? "default" : "outline"}
-                    disabled={!selectedPet && !formData.petName}
-                    onClick={() =>
-                      navigate(
-                        `/booking/${serviceId}/${duration.id}?walks=${walksPerDay}&schedule=${schedule}` +
-                        `&petId=${selectedPet || ""}&petName=${encodeURIComponent(formData.petName || "")}`
-                      )
-                    }
-                  >
-                    {selectedPet || formData.petName ? "Select" : "Select/Add Pet First"}
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        })}
-      </div>
+              {/* Features */}
+              <div className="mb-6">
+                <ul className="space-y-2">
+                  {features.map((feature, index) => (
+                    <li key={index} className="flex items-center space-x-2">
+                      <Check size={16} className="text-green-500" />
+                      <span className="text-sm text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-      {/* ---------- Features ---------- */}
-      <div className="mt-2 bg-muted/50 rounded-lg p-6">
-        <h3 className="text-lg font-semibold mb-4">All packages include:</h3>
-        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-          {commonFeatures.map((feature, i) => (
-            <li key={i} className="flex items-center gap-2 text-sm">
-              <Check className="h-4 w-4 text-green-500" /> {feature}
-            </li>
-          ))}
-        </ul>
+              {/* Select Package Button */}
+              <button
+                onClick={() => setPackageSelected(!packageSelected)}
+                className={`w-full py-3 rounded-xl font-medium transition-colors ${
+                  packageSelected
+                    ? 'bg-green-500 text-white'
+                    : 'bg-indigo-500 text-white hover:bg-indigo-600'
+                }`}
+              >
+                {packageSelected ? 'Package Selected ✓' : 'Select Package'}
+              </button>
+            </div>
+          </div>
+
+          {/* Service Date */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-gray-800">Service Required Date</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                />
+                <label className="block text-xs text-gray-500 mt-1">From</label>
+              </div>
+              <div>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                />
+                <label className="block text-xs text-gray-500 mt-1">To</label>
+              </div>
+            </div>
+          </div>
+
+          {/* Preferable Time */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2 mb-3">
+              <Clock size={20} className="text-indigo-500" />
+              <h2 className="text-lg font-semibold text-gray-800">Select Preferable Time</h2>
+            </div>
+            
+            <div className="space-y-3">
+              {timeSlots.map((slot) => (
+                <div
+                  key={slot.id}
+                  className={`flex items-center justify-between p-4 border-2 rounded-xl transition-colors ${
+                    selectedTime === slot.id
+                      ? 'border-indigo-500 bg-indigo-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="radio"
+                      id={slot.id}
+                      name="timeSlot"
+                      checked={selectedTime === slot.id}
+                      onChange={() => setSelectedTime(slot.id)}
+                      className="w-4 h-4 text-indigo-600"
+                    />
+                    <label htmlFor={slot.id} className="font-medium text-gray-700">
+                      {slot.label}
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="text"
+                      placeholder="00:00"
+                      value={selectedTime === slot.id ? customTime : ''}
+                      onChange={(e) => selectedTime === slot.id && setCustomTime(e.target.value)}
+                      className="w-16 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-transparent"
+                    />
+                    <span className="text-sm text-gray-500">{slot.suffix}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Proceed Button */}
+          <button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-[1.02] shadow-lg">
+            Proceed
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default WalkingServiceCards;
+export default PetBookingService;

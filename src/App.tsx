@@ -9,6 +9,9 @@ import ServiceDetail from "./pages/ServiceDetail";
 import BookingForm from "./pages/BookingForm";
 import BookingSummary from "./pages/BookingSummary";
 import MyRequests from "./pages/MyRequests";
+import Login from "./pages/Login";
+import OTPVerification from "./pages/OTPVerification";
+import HomePage from "./pages/HomePage";
 
 const queryClient = new QueryClient();
 
@@ -19,9 +22,16 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/verify-otp" element={<OTPVerification />} />
+          <Route path="/home" element={<HomePage />} />
+
           <Route path="/" element={<Index />} />
           <Route path="/service/:serviceId" element={<ServiceDetail />} />
-          <Route path="/booking/:serviceId/:packageId" element={<BookingForm />} />
+          <Route
+            path="/booking/:serviceId/:packageId"
+            element={<BookingForm />}
+          />
           <Route path="/booking/summary" element={<BookingSummary />} />
           <Route path="/requests" element={<MyRequests />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
