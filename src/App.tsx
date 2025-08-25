@@ -12,6 +12,9 @@ import MyRequests from "./pages/MyRequests";
 import Login from "./pages/Login";
 import OTPVerification from "./pages/OTPVerification";
 import HomePage from "./pages/HomePage";
+import WalletComponent from "./pages/WalletComponent";
+import BookingsComponent from "@/components/BookingsComponent";
+
 
 const queryClient = new QueryClient();
 
@@ -25,6 +28,8 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/verify-otp" element={<OTPVerification />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="/wallet" element={<WalletComponent />} />
+          <Route path="/bookings" element={<BookingsComponent />} />
 
           <Route path="/" element={<Index />} />
           <Route path="/service/:serviceId" element={<ServiceDetail />} />

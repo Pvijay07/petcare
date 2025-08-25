@@ -1,0 +1,39 @@
+// src/data/transactions.json
+[
+  {
+    "id": 1,
+    "petMaster": "Ugendra",
+    "service": "Training",
+    "amount": "+15000/-",
+    "description": "Booking amt",
+    "date": "11-05-2023",
+    "type": "credit"
+  },
+  {
+    "id": 2,
+    "petMaster": "Jayanta",
+    "service": "Grooming",
+    "amount": "-15000/-",
+    "description": "Paid amt",
+    "date": "11-05-2023",
+    "type": "debit"
+  },
+  {
+    "id": 3,
+    "petMaster": "Lokesh",
+    "service": "Walking",
+    "amount": "+15000/-",
+    "description": "Booking amt",
+    "date": "11-05-2023",
+    "type": "credit"
+  },
+  {
+    "id": 4,
+    "petMaster": "Mahesh",
+    "service": "Boarding",
+    "amount": "+15000/-",
+    "description": "Booking amt",
+    "date": "11-05-2023",
+    "type": "credit"
+  }
+]
